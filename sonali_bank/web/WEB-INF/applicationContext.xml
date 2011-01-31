@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+    <import resource="classpath:META-INF/cxf/cxf.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:db.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${driverClass}"/>
+        <property name="jdbcUrl" value="${jdbcUrl}"/>
+        <property name="user" value="${user}"/>
+        <property name="password" value="${password}"/>
+
+        <property name="minPoolSize" value="5"/>
+        <property name="maxPoolSize" value="20"/>
+        <property name="checkoutTimeout" value="300"/>
+        <property name="maxStatements" value="100"/>
+    </bean>
+
+
+    <bean name="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="annotatedClasses">
+            <list>
+                <value>gov.sonali_bank.domain.User</value>
+                <value>gov.sonali_bank.domain.SonaliBankRecord</value>
+            </list>
+        </property>
+
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <!--<prop key="hibernate.hbm2ddl.auto">create-drop</prop>-->
+                <prop key="hibernate.format_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="messages"/>
+    </bean>
+
+
+    <bean id="txManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="matchTxAttributeSource"
+          class="org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource">
+        <property name="properties">
+            <props>
+                <prop key="save*">PROPAGATION_REQUIRED</prop>
+                <prop key="update*">PROPAGATION_REQUIRED</prop>
+                <prop key="get*">PROPAGATION_REQUIRED</prop>
+                <prop key="find*">PROPAGATION_REQUIRED</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="txInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager" ref="txManager"/>
+        <property name="transactionAttributeSource" ref="matchTxAttributeSource"/>
+    </bean>
+
+    <bean id="autoProxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="interceptorNames">
+            <list>
+                <idref local="txInterceptor"/>
+            </list>
+        </property>
+        <property name="beanNames">
+            <list>
+                <value>*Service</value>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="nbrRecordService" class="gov.sonali_bank.service.SonaliBankRecordServiceImpl">
+        <property name="nIDServiceClient" ref="nIDServiceClient"/>
+        <property name="ncraServiceClient" ref="ncraServiceClient"/>
+    </bean>
+
+    <jaxws:client id="nIDServiceClient"
+                  serviceClass="gov.ec.ws.NIDService"
+                  address="http://localhost:8080/ec/ws/NIDService">
+    </jaxws:client>
+
+    <jaxws:client id="ncraServiceClient"
+                  serviceClass="gov.ncra.ws.NCRAService"
+                  address="http://localhost:8080/brta/ws/NCRAService">
+    </jaxws:client>
+
+
+    <bean id="sonaliBankServiceImpl" class="gov.sonali_bank.ws.SonaliBankServiceImpl" >
+         <property name="nbrRecordService" ref="nbrRecordService"/>       
+    </bean>
+
+
+    <jaxws:endpoint id="sonaliBankServiceService" implementor="#sonaliBankServiceImpl" address="/SonaliBankService" />
+
+
+</beans>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+    <context:component-scan base-package="gov.sonali_bank.web.controller"/>
+    <context:component-scan base-package="gov.sonali_bank.service"/>
+
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <bean id="userDao" class="gov.sonali_bank.dao.UserDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <jaxws:client id="sonali_bankServiceClient"
+                  serviceClass="gov.sonali_bank.ws.SonaliBankService"
+                  address="http://localhost:8080/sonali_bank/ws/SonaliBankService">
+    </jaxws:client>
+
+    <bean name="/wsTest" class="gov.sonali_bank.web.controller.WSTestController">
+        <property name="sonali_bankServiceClient" ref="sonali_bankServiceClient"/>
+    </bean>
+
+</beans>

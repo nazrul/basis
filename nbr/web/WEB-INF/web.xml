@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app version="2.4"
+         xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" >
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/applicationContext.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>app</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+		<servlet-name>ws</servlet-name>
+		<servlet-class>
+			org.apache.cxf.transport.servlet.CXFServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ws</servlet-name>
+		<url-pattern>/ws/*</url-pattern>
+	</servlet-mapping>
+
+
+    <servlet-mapping>
+        <servlet-name>app</servlet-name>
+        <url-pattern>/app/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>visitor</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>visitor</servlet-name>
+        <url-pattern>/visitor/*</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>sitemesh</filter-name>
+        <filter-class>com.opensymphony.sitemesh.webapp.SiteMeshFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>loginFilter</filter-name>
+        <filter-class>gov.nbr.web.filter.LoginFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>loginFilter</filter-name>
+        <servlet-name>app</servlet-name>
+    </filter-mapping>
+
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <jsp-config>
+        <taglib>
+            <taglib-uri>/spring</taglib-uri>
+            <taglib-location>/WEB-INF/spring-form.tld</taglib-location>
+        </taglib>
+
+        <taglib>
+            <taglib-uri>http://java.sun.com/jsp/jstl/core</taglib-uri>
+            <taglib-location>/WEB-INF/c.tld</taglib-location>
+        </taglib>
+
+        <taglib>
+            <taglib-uri>http://java.sun.com/jsp/jstl/fmt</taglib-uri>
+            <taglib-location>/WEB-INF/fmt.tld</taglib-location>
+        </taglib>
+    </jsp-config>
+
+</web-app>

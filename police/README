@@ -1,0 +1,18 @@
+Extensive Quester, Softexpo 2011
+--------------------------------------------------
+1. INTRODUCTION
+This project is for the competition organized by Softexpo in the category
+professional, fully written in Java. This is an MVC web application.
+
+2. RELEASE INFO
+This project needs JDK 1.5, J2EE 1.3 (Servlet 2.3, JSP 1.2, JTA 1.0, EJB 2.0),
+Spring Framework 2.5, HSQLDB, Hibernate 3.0, apache-ant 1.7, apache-tomcat 6.0 etc.
+
+3. INSTALLATION
+    For building this project you have update the build.properties file for your
+enviornment and then just start the build.xml ant script with ant build
+command.
+    In the second line of props/log4j.properties file need to setup log file path
+where you want the log file to be for this application
+    For starting the database we need to run the /db/run.sh from project
+directory.

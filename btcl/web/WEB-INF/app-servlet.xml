@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+    <context:component-scan base-package="gov.btcl.web.controller"/>
+    <context:component-scan base-package="gov.btcl.service"/>
+
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <bean id="userDao" class="gov.btcl.dao.UserDaoImpl">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <jaxws:client id="btclServiceClient"
+                  serviceClass="gov.btcl.ws.BTCLService"
+                  address="http://localhost:8080/btcl/ws/BTCLService">
+    </jaxws:client>
+
+    <bean name="/wsTest" class="gov.btcl.web.controller.WSTestController">
+        <property name="btclServiceClient" ref="btclServiceClient"/>
+    </bean>
+
+</beans>
